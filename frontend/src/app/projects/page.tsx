@@ -26,6 +26,37 @@ const defaultProjects: ProjectItem[] = [];
 
 const defaultTasks: ProjectTask[] = [];
 
+const getUserStorageKey = (user: { email?: string; name?: string } | null | undefined, suffix: string) => {
+  const identity = user?.email || user?.name || "anonymous-user";
+  return `taskflow-${suffix}-${encodeURIComponent(identity)}`;
+};
+
+const readUserScopedProjects = (user: { email?: string; name?: string } | null | undefined): ProjectItem[] => {
+  if (typeof window === "undefined") return defaultProjects;
+  const raw = localStorage.getItem(getUserStorageKey(user, "projects"));
+  if (!raw) return defaultProjects;
+
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : defaultProjects;
+  } catch {
+    return defaultProjects;
+  }
+};
+
+const readUserScopedTasks = (user: { email?: string; name?: string } | null | undefined): ProjectTask[] => {
+  if (typeof window === "undefined") return defaultTasks;
+  const raw = localStorage.getItem(getUserStorageKey(user, "project-tasks"));
+  if (!raw) return defaultTasks;
+
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : defaultTasks;
+  } catch {
+    return defaultTasks;
+  }
+};
+
 const getStoredProjects = () => {
   if (typeof window === "undefined") return defaultProjects;
   const raw = localStorage.getItem("taskflow-projects");
@@ -90,12 +121,14 @@ export default function ProjectsPage() {
     if (typeof window === "undefined") return;
     const savedUser = localStorage.getItem("user-profile");
     const savedSession = localStorage.getItem("auth-session") === "active" && !!localStorage.getItem("session-token");
+    const parsedUser = savedUser ? JSON.parse(savedUser) : user;
     setIsAuthenticated(savedSession);
     if (savedUser) {
-      setUser(JSON.parse(savedUser));
+      setUser(parsedUser);
     }
-    const storedProjects = getStoredProjects();
-    const storedTasks = getStoredTasks();
+
+    const storedProjects = readUserScopedProjects(parsedUser);
+    const storedTasks = readUserScopedTasks(parsedUser);
     setProjects(storedProjects);
     setTasks(storedTasks);
     if (storedProjects[0]) {
@@ -114,15 +147,15 @@ export default function ProjectsPage() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      localStorage.setItem("taskflow-projects", JSON.stringify(projects));
+      localStorage.setItem(getUserStorageKey(user, "projects"), JSON.stringify(projects));
     }
-  }, [projects]);
+  }, [projects, user]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      localStorage.setItem("taskflow-tasks", JSON.stringify(tasks));
+      localStorage.setItem(getUserStorageKey(user, "project-tasks"), JSON.stringify(tasks));
     }
-  }, [tasks]);
+  }, [tasks, user]);
 
   const handleToggleTheme = () => {
     setDarkMode((current) => {

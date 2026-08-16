@@ -54,6 +54,25 @@ const defaultUser: UserProfile = {
   email: "user@taskflow.local",
 };
 
+const getUserStorageKey = (user: Partial<UserProfile> | null | undefined, suffix: string) => {
+  const identity = user?.email || user?.name || "anonymous-user";
+  return `taskflow-${suffix}-${encodeURIComponent(identity)}`;
+};
+
+const readUserStoredTasks = (user: Partial<UserProfile> | null | undefined): TaskItem[] => {
+  if (typeof window === "undefined") return [];
+
+  const raw = localStorage.getItem(getUserStorageKey(user, "tasks"));
+  if (!raw) return [];
+
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
 const formatDueDate = (value: string) => {
   if (!value) return "";
   const parsed = new Date(value);
@@ -105,7 +124,7 @@ export default function HomePage() {
   const [fieldSection, setFieldSection] = useState<"list" | "board">("list");
   const [showFilter, setShowFilter] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState<string[]>(["Priority", "Members", "Due Date"]);
-  const [tasks, setTasks] = useState<TaskItem[]>(initialTasks);
+  const [tasks, setTasks] = useState<TaskItem[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
@@ -121,19 +140,31 @@ export default function HomePage() {
     const savedSession = localStorage.getItem("auth-session") === "active";
     const savedUser = localStorage.getItem("user-profile");
     const storedProjects = getStoredProjects();
+    const persistedUser = savedUser ? JSON.parse(savedUser) : defaultUser;
 
     setDarkMode(savedTheme);
     setAccent(savedAccent);
     setIsAuthenticated(savedSession);
     setAvailableProjects(storedProjects);
+    setUser(persistedUser);
+    setTasks(readUserStoredTasks(persistedUser));
     if (!taskDraft.projectId && storedProjects[0]) {
       setTaskDraft((current) => ({ ...current, projectId: storedProjects[0].id }));
     }
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
     setHasHydrated(true);
   }, []);
+
+  useEffect(() => {
+    if (!hasHydrated || typeof window === "undefined") return;
+    const key = getUserStorageKey(user, "tasks");
+    localStorage.setItem(key, JSON.stringify(tasks));
+  }, [tasks, user, hasHydrated]);
+
+  useEffect(() => {
+    if (!hasHydrated || typeof window === "undefined") return;
+    const key = getUserStorageKey(user, "projects");
+    localStorage.setItem(key, JSON.stringify(availableProjects));
+  }, [availableProjects, user, hasHydrated]);
 
   const handleToggleTheme = () => {
     setDarkMode((current) => {
@@ -146,7 +177,7 @@ export default function HomePage() {
   const handleGuestLogin = () => {
     const guestUser: UserProfile = {
       name: "Guest User",
-      email: "guest@taskflow.local",
+      email: `guest-${Date.now()}@taskflow.local`,
     };
 
     const sessionToken = `guest-${Date.now()}`;
@@ -154,6 +185,7 @@ export default function HomePage() {
     setLoginError("");
     setUser(guestUser);
     setIsAuthenticated(true);
+    setTasks(readUserStoredTasks(guestUser));
     localStorage.setItem("user-profile", JSON.stringify(guestUser));
     localStorage.setItem("auth-session", "active");
     localStorage.setItem("session-token", sessionToken);
@@ -194,7 +226,7 @@ export default function HomePage() {
         const data = await backendResponse.json();
         const googleUser: UserProfile = {
           name: data?.user?.name || "Google User",
-          email: data?.user?.email || "google-user@gmail.com",
+          email: data?.user?.email || `google-${Date.now()}@gmail.com`,
           picture: data?.user?.picture || "",
         };
 
@@ -203,6 +235,7 @@ export default function HomePage() {
         setLoginError("");
         setUser(googleUser);
         setIsAuthenticated(true);
+        setTasks(readUserStoredTasks(googleUser));
         localStorage.setItem("user-profile", JSON.stringify(googleUser));
         localStorage.setItem("auth-session", "active");
         localStorage.setItem("session-token", sessionToken);
