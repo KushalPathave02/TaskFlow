@@ -430,7 +430,10 @@ export default function ProjectsPage() {
                     <h2 className={`text-[18px] font-semibold ${darkMode ? "text-slate-100" : "text-slate-800"}`}>{selectedProject.name}</h2>
                     <p className={darkMode ? "text-sm text-slate-400" : "text-sm text-slate-500"}>{selectedProject.description}</p>
                   </div>
-                  <button onClick={closeProjectDetails} className={darkMode ? "rounded-xl border border-[#1f2a3d] px-3 py-2 text-sm text-slate-200" : "rounded-xl border border-[#dfe3e8] px-3 py-2 text-sm text-slate-700"}>Cancel</button>
+                  <div className="flex items-center gap-2">
+                    <button onClick={openTaskModalForSelectedProject} className="rounded-xl bg-[#171717] px-3 py-2 text-sm font-medium text-white">Add Task</button>
+                    <button onClick={closeProjectDetails} className={darkMode ? "rounded-xl border border-[#1f2a3d] px-3 py-2 text-sm text-slate-200" : "rounded-xl border border-[#dfe3e8] px-3 py-2 text-sm text-slate-700"}>Cancel</button>
+                  </div>
                 </div>
 
                 <div className="mb-5 grid grid-cols-3 gap-3">
@@ -449,6 +452,13 @@ export default function ProjectsPage() {
                 </div>
 
                 <div className="space-y-4">
+                  {projectTasks.length === 0 && (
+                    <div className={darkMode ? "rounded-[18px] border border-dashed border-[#1f2a3d] bg-[#0f172a] p-6 text-center text-sm text-slate-400" : "rounded-[18px] border border-dashed border-[#dfe3e8] bg-[#f9fafb] p-6 text-center text-sm text-slate-500"}>
+                      No tasks yet for this project.
+                      <button onClick={openTaskModalForSelectedProject} className="mt-3 block w-full rounded-xl bg-[#171717] px-3 py-2 text-sm font-medium text-white">Add Task</button>
+                    </div>
+                  )}
+
                   {projectTasks.map((task) => (
                     <div key={task.id} className={darkMode ? "rounded-[18px] border border-[#1f2a3d] bg-[#0f172a] p-4" : "rounded-[18px] border border-[#e5e7eb] bg-[#f9fafb] p-4"}>
                       <div className="mb-3 flex items-center justify-between">
