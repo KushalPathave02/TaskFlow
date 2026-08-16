@@ -46,39 +46,9 @@ const readUserScopedProjects = (user: { email?: string; name?: string } | null |
 
 const readUserScopedTasks = (user: { email?: string; name?: string } | null | undefined): ProjectTask[] => {
   if (typeof window === "undefined") return defaultTasks;
-  const raw = localStorage.getItem(getUserStorageKey(user, "project-tasks"));
+  const raw = localStorage.getItem(getUserStorageKey(user, "tasks"));
   if (!raw) return defaultTasks;
 
-  try {
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : defaultTasks;
-  } catch {
-    return defaultTasks;
-  }
-};
-
-const getStoredProjects = () => {
-  if (typeof window === "undefined") return defaultProjects;
-  const raw = localStorage.getItem("taskflow-projects");
-  if (!raw) {
-    localStorage.setItem("taskflow-projects", JSON.stringify(defaultProjects));
-    return defaultProjects;
-  }
-  try {
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) && parsed.length ? parsed : defaultProjects;
-  } catch {
-    return defaultProjects;
-  }
-};
-
-const getStoredTasks = () => {
-  if (typeof window === "undefined") return defaultTasks;
-  const raw = localStorage.getItem("taskflow-tasks");
-  if (!raw) {
-    localStorage.setItem("taskflow-tasks", JSON.stringify(defaultTasks));
-    return defaultTasks;
-  }
   try {
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : defaultTasks;
@@ -153,7 +123,7 @@ export default function ProjectsPage() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      localStorage.setItem(getUserStorageKey(user, "project-tasks"), JSON.stringify(tasks));
+      localStorage.setItem(getUserStorageKey(user, "tasks"), JSON.stringify(tasks));
     }
   }, [tasks, user]);
 
@@ -361,7 +331,12 @@ export default function ProjectsPage() {
                   return (
                     <div
                       key={project.id}
-                      className={darkMode ? `grid grid-cols-[1.7fr_0.7fr_0.7fr_0.7fr_0.3fr] items-center gap-4 border-b border-[#1f2a3d] px-4 py-4 text-[15px] ${selectedProjectId === project.id ? "bg-[#101827]" : ""}` : `grid grid-cols-[1.7fr_0.7fr_0.7fr_0.7fr_0.3fr] items-center gap-4 border-b border-[#e3e5e8] px-4 py-4 text-[15px] ${selectedProjectId === project.id ? "bg-white" : ""}`}
+                      onClick={() => {
+                        setSelectedProjectId(project.id);
+                        setNewTaskProjectId(project.id);
+                        setProjectMenuOpenId(null);
+                      }}
+                      className={darkMode ? `cursor-pointer grid grid-cols-[1.7fr_0.7fr_0.7fr_0.7fr_0.3fr] items-center gap-4 border-b border-[#1f2a3d] px-4 py-4 text-[15px] ${selectedProjectId === project.id ? "bg-[#101827]" : ""}` : `cursor-pointer grid grid-cols-[1.7fr_0.7fr_0.7fr_0.7fr_0.3fr] items-center gap-4 border-b border-[#e3e5e8] px-4 py-4 text-[15px] ${selectedProjectId === project.id ? "bg-white" : ""}`}
                     >
                       <div className={darkMode ? "font-medium text-slate-200" : "font-medium text-slate-700"}>{project.name}</div>
                       <div className="flex items-center gap-2">

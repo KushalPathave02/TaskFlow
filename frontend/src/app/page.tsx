@@ -82,11 +82,12 @@ const formatDueDate = (value: string) => {
 
 const defaultProjects: ProjectOption[] = [];
 
-const getStoredProjects = (): ProjectOption[] => {
+const getStoredProjects = (user: Partial<UserProfile> | null | undefined = defaultUser): ProjectOption[] => {
   if (typeof window === "undefined") return defaultProjects;
-  const raw = localStorage.getItem("taskflow-projects");
+  const key = getUserStorageKey(user, "projects");
+  const raw = localStorage.getItem(key);
   if (!raw) {
-    localStorage.setItem("taskflow-projects", JSON.stringify(defaultProjects));
+    localStorage.setItem(key, JSON.stringify(defaultProjects));
     return defaultProjects;
   }
 
@@ -139,8 +140,8 @@ export default function HomePage() {
     const savedAccent = localStorage.getItem("theme-accent") || "#8b5cf6";
     const savedSession = localStorage.getItem("auth-session") === "active";
     const savedUser = localStorage.getItem("user-profile");
-    const storedProjects = getStoredProjects();
     const persistedUser = savedUser ? JSON.parse(savedUser) : defaultUser;
+    const storedProjects = getStoredProjects(persistedUser);
 
     setDarkMode(savedTheme);
     setAccent(savedAccent);
