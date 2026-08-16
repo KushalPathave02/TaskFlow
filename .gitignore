@@ -1,0 +1,36 @@
+# Node / package managers
+node_modules/
+**/node_modules/
+.npm/
+
+# Frontend build output
+frontend/.next/
+frontend/out/
+frontend/coverage/
+
+# Backend build output
+backend/dist/
+backend/coverage/
+
+# Environment files
+.env
+.env.*
+!backend/.env.example
+!frontend/.env.example
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE/editor
+.vscode/
+.idea/
+
+# Misc
+*.tsbuildinfo
