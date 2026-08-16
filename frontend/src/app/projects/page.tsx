@@ -22,17 +22,9 @@ type ProjectItem = {
   createdAt: string;
 };
 
-const defaultProjects: ProjectItem[] = [
-  { id: "project-default", name: "Design Homepage", description: "Homepage redesign and layout validation", createdAt: "2026-08-15" },
-  { id: "project-login", name: "Develop Login Feature", description: "Authentication and onboarding flow", createdAt: "2026-08-16" },
-  { id: "project-gateway", name: "Test Payment Gateway", description: "Staging validation and release checks", createdAt: "2026-08-17" },
-];
+const defaultProjects: ProjectItem[] = [];
 
-const defaultTasks: ProjectTask[] = [
-  { id: "p-task-1", title: "Design Homepage", status: "In Progress", priority: "High", due: "2026-09-12", assignee: "Dexter", projectId: "project-default", subtasks: [{ id: "st-1", title: "Hero section", done: true }, { id: "st-2", title: "CTA copy", done: false }] },
-  { id: "p-task-2", title: "Develop Login Feature", status: "Completed", priority: "Low", due: "2026-09-15", assignee: "CN", projectId: "project-login", subtasks: [{ id: "st-3", title: "UI polish", done: true }] },
-  { id: "p-task-3", title: "Test Payment Gateway", status: "To Do", priority: "Medium", due: "2026-09-18", assignee: "Dexter", projectId: "project-gateway", subtasks: [{ id: "st-4", title: "Smoke test", done: false }] },
-];
+const defaultTasks: ProjectTask[] = [];
 
 const getStoredProjects = () => {
   if (typeof window === "undefined") return defaultProjects;
@@ -73,7 +65,7 @@ export default function ProjectsPage() {
     if (typeof window === "undefined") return "#8b5cf6";
     return localStorage.getItem("theme-accent") || "#8b5cf6";
   });
-  const [user, setUser] = useState({ name: "Dexter", email: "dexter@gmail.com" });
+  const [user, setUser] = useState({ name: "New User", email: "user@taskflow.local" });
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [projects, setProjects] = useState<ProjectItem[]>(defaultProjects);
   const [tasks, setTasks] = useState<ProjectTask[]>(defaultTasks);
@@ -85,8 +77,8 @@ export default function ProjectsPage() {
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskStatus, setNewTaskStatus] = useState<ProjectTask["status"]>("To Do");
   const [newTaskPriority, setNewTaskPriority] = useState<ProjectTask["priority"]>("Medium");
-  const [newTaskAssignee, setNewTaskAssignee] = useState("Dexter");
-  const [newTaskDue, setNewTaskDue] = useState("2026-09-29");
+  const [newTaskAssignee, setNewTaskAssignee] = useState("User");
+  const [newTaskDue, setNewTaskDue] = useState("");
   const [newTaskProjectId, setNewTaskProjectId] = useState(defaultProjects[0]?.id || "");
   const [subtaskTitle, setSubtaskTitle] = useState("");
   const [activeSubtaskTarget, setActiveSubtaskTarget] = useState<string | null>(null);
@@ -142,7 +134,7 @@ export default function ProjectsPage() {
 
   const handleLogout = () => {
     setIsAuthenticated(false);
-    setUser({ name: "Dexter", email: "dexter@gmail.com" });
+    setUser({ name: "New User", email: "user@taskflow.local" });
     localStorage.removeItem("auth-session");
     localStorage.removeItem("session-token");
     localStorage.removeItem("user-profile");
@@ -228,8 +220,8 @@ export default function ProjectsPage() {
     setNewTaskTitle("");
     setNewTaskStatus("To Do");
     setNewTaskPriority("Medium");
-    setNewTaskAssignee("Dexter");
-    setNewTaskDue("2026-09-29");
+    setNewTaskAssignee("User");
+    setNewTaskDue("");
     setTaskCreateError("");
     setShowTaskModal(false);
   };
@@ -329,7 +321,7 @@ export default function ProjectsPage() {
               <div className="space-y-0">
                 {projects.map((project) => {
                   const projectTaskList = tasks.filter((task) => task.projectId === project.id);
-                  const lead = projectTaskList[0]?.assignee || "Dexter";
+                  const lead = projectTaskList[0]?.assignee || "User";
                   const priority = projectTaskList[0]?.priority || "Medium";
                   const due = projectTaskList[0]?.due || "2026-09-29";
 

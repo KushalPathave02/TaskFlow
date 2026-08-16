@@ -17,7 +17,7 @@ export default function SettingsPage() {
   const [activeTheme, setActiveTheme] = useState<"light" | "dark" | "system">("dark");
   const [accent, setAccent] = useState<(typeof accentColors)[number]["id"]>("violet");
   const [showAccentMenu, setShowAccentMenu] = useState(false);
-  const [user, setUser] = useState({ name: "Dexter", email: "dexter@gmail.com" });
+  const [user, setUser] = useState({ name: "New User", email: "user@taskflow.local" });
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
@@ -47,7 +47,7 @@ export default function SettingsPage() {
 
   const handleLogout = () => {
     setIsAuthenticated(false);
-    setUser({ name: "Dexter", email: "dexter@gmail.com" });
+    setUser({ name: "New User", email: "user@taskflow.local" });
     localStorage.removeItem("auth-session");
     localStorage.removeItem("session-token");
     localStorage.removeItem("user-profile");

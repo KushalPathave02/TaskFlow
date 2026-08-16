@@ -50,8 +50,8 @@ type UserProfile = {
 };
 
 const defaultUser: UserProfile = {
-  name: "Dexter",
-  email: "dexter@gmail.com",
+  name: "New User",
+  email: "user@taskflow.local",
 };
 
 const formatDueDate = (value: string) => {
@@ -61,11 +61,7 @@ const formatDueDate = (value: string) => {
   return parsed.toLocaleDateString("en-GB", { day: "2-digit", month: "short" });
 };
 
-const defaultProjects: ProjectOption[] = [
-  { id: "project-default", name: "Design Homepage" },
-  { id: "project-login", name: "Develop Login Feature" },
-  { id: "project-gateway", name: "Test Payment Gateway" },
-];
+const defaultProjects: ProjectOption[] = [];
 
 const getStoredProjects = (): ProjectOption[] => {
   if (typeof window === "undefined") return defaultProjects;
@@ -83,25 +79,18 @@ const getStoredProjects = (): ProjectOption[] => {
   }
 };
 
-const defaultTaskDraft = (projectId = defaultProjects[0]?.id || ""): Omit<TaskItem, "id"> => ({
+const defaultTaskDraft = (projectId = ""): Omit<TaskItem, "id"> => ({
   title: "",
   priority: "Medium",
-  owner: "Dexter",
+  owner: "User",
   reporter: "Admin",
-  due: "2026-08-29",
+  due: "",
   status: "To Do",
   labels: ["General"],
   projectId,
 });
 
-const initialTasks: TaskItem[] = [
-  { id: "task-1", title: "Write API Documentation", priority: "High", owner: "Admin", reporter: "Product Team", due: "29 Jul", status: "To Do", labels: ["Deployment", "Docs"] },
-  { id: "task-2", title: "Implement Search Function", priority: "Low", owner: "Admin", reporter: "Engineering", due: "29 Jul", status: "To Do", labels: ["Search", "UI"] },
-  { id: "task-3", title: "Deploy to Production", priority: "High", owner: "Admin", reporter: "Release", due: "29 Jul", status: "To Do", labels: ["Deployment", "Release"] },
-  { id: "task-4", title: "Code Review Completed", priority: "High", owner: "Admin", reporter: "QA", due: "29 Jul", status: "In Progress", labels: ["Review", "QA"] },
-  { id: "task-5", title: "Design Mockups Finalized", priority: "Low", owner: "Admin", reporter: "Design", due: "29 Jul", status: "In Progress", labels: ["Design", "UX"] },
-  { id: "task-6", title: "Security Audit Scheduled", priority: "Medium", owner: "Admin", reporter: "Security", due: "01 Aug", status: "Completed", labels: ["Security", "Scheduled"] },
-];
+const initialTasks: TaskItem[] = [];
 
 const filterOptions = ["Priority", "Members", "Due Date", "Labels", "Status", "Reporter"];
 
@@ -190,7 +179,9 @@ export default function HomePage() {
       }
 
       try {
-        const backendResponse = await fetch("http://localhost:4000/api/auth/google", {
+        const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+
+        const backendResponse = await fetch(`${apiBase}/api/auth/google`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ credential: response.credential }),

@@ -31,16 +31,16 @@ const avatarGradients = [
 ];
 
 const getAvatarMeta = (name: string) => {
-  const initials = name?.trim()?.charAt(0)?.toUpperCase() || "D";
-  const hash = Array.from(name || "Dexter").reduce((sum, char) => sum + char.charCodeAt(0), 0);
+  const initials = name?.trim()?.charAt(0)?.toUpperCase() || "U";
+  const hash = Array.from(name || "User").reduce((sum, char) => sum + char.charCodeAt(0), 0);
   const gradient = avatarGradients[hash % avatarGradients.length];
 
   return { initials, gradient };
 };
 
 const defaultUser: UserProfile = {
-  name: "Dexter",
-  email: "dexter@gmail.com",
+  name: "New User",
+  email: "user@taskflow.local",
 };
 
 export default function Sidebar({
